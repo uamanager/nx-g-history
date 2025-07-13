@@ -12,6 +12,9 @@ permissions:
   contents: write
 
 jobs:
-  lint-test-build:
+  nx-angular-monorepo-workflow-job:
     name: Nx Angular-monorepo Workflow Job
     uses: ./.github/workflows/nx-angular-monorepo-workflow.yml
+  nx-nest-workflow-job:
+    name: Nx Nest Workflow Job
+    uses: ./.github/workflows/nx-nest-workflow.yml

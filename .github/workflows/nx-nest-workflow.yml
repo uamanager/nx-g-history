@@ -1,0 +1,97 @@
+name: Nx Nest Workflow
+on:
+  workflow_dispatch:
+  workflow_call:
+
+env:
+  NAME: 'nx-nest'
+  GIT_USER_NAME: 'github-actions[bot]'
+  GIT_USER_EMAIL: 'github-actions[bot]@users.noreply.github.com'
+
+concurrency:
+  group: nx-nest-workflow
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  push:
+    name: Generate Nx Angular-monorepo
+    strategy:
+      matrix:
+        unitTestRunner: [ jest, vitest, none ]
+        e2eTestRunner: [ playwright, cypress, none ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Step
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Branch
+        run: |
+          BRANCH=${{ env.NAME }}-${{ matrix.unitTestRunner }}-${{ matrix.e2eTestRunner }}
+          git fetch origin $BRANCH || true
+          if git show-ref --verify --quiet refs/remotes/origin/$BRANCH; then
+          git checkout $BRANCH
+          git merge origin/$BRANCH
+          else
+          git checkout -b $BRANCH
+          fi
+          echo "BRANCH_NAME=$BRANCH" >> $GITHUB_ENV
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Get Nx Version
+        id: nx_version
+        run: |
+          VERSION=$(npx -y create-nx-workspace@latest --version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Configure Git Step
+        run: |
+          git config user.name ${{ env.GIT_USER_NAME }}
+          git config user.email ${{ env.GIT_USER_EMAIL }}
+
+      - name: Remove Previous Version Step
+        run: rm -rf ./${{ env.NAME }}
+
+      - name: Generate Next Version Step
+        run: |
+          npx -y create-nx-workspace@latest \
+          --name=${{ env.NAME }} \
+          --preset=nest \
+          --interactive=false \
+          --workspaceType=integrated \
+          --appName=client \
+          --style=scss \
+          --standaloneApi=true \
+          --routing=true \
+          --framework=nest \
+          --unitTestRunner=${{ matrix.unitTestRunner }} \
+          --e2eTestRunner=${{ matrix.e2eTestRunner }} \
+          --skipGit=false \
+          --docker=false \
+          --workspaces=false \
+          --useProjectJson=true \
+          --ci=skip
+
+      - name: Commit Changes Step
+        id: git_commit
+        run: |
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes detected"
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            git commit -m "chore(${{ env.NAME }}): create-nx-workspace@${{ steps.nx_version.outputs.version }}"
+            echo "changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Push Branch
+        if: steps.git_commit.outputs.changes == 'true'
+        run: git push origin ${{ env.BRANCH_NAME }}
