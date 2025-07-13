@@ -105,7 +105,7 @@ jobs:
       - name: Generate Library Step
         run: |
           cd workspace && \
-          nx g @nx/${{ matrix.runner }}:lib libs/${{ matrix.name }}/core \
+          npx -y nx@latest g @nx/${{ matrix.runner }}:lib libs/${{ matrix.name }}/core \
           --importPath=@workspace/${{ matrix.name }}-core \
           --name=${{ matrix.name }}-core \
           --linter=eslint \
