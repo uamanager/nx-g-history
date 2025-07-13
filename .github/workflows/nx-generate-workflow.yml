@@ -24,10 +24,11 @@ jobs:
     name: Generate Nx Monorepo
     strategy:
       matrix:
-        preset: [ angular, nest ]
+        preset: [ angular-monorepo, nest ]
         bundler: [ esbuild ]
         unitTestRunner: [ jest, vitest, none ]
         e2eTestRunner: [ playwright, cypress, none ]
+        library: [ true, false ]
         exclude:
           - preset: nest
             unitTestRunner: vitest
@@ -37,8 +38,12 @@ jobs:
             e2eTestRunner: cypress
         include:
           - name: client
-            preset: angular
+            preset: angular-monorepo
           - name: server
+            preset: nest
+          - runner: angular
+            preset: angular-monorepo
+          - runner: nest
             preset: nest
     runs-on: ubuntu-latest
     steps:
@@ -97,6 +102,17 @@ jobs:
           --workspaces=false \
           --useProjectJson=true \
           --ci=skip
+
+      - name: Generate Library Step
+        if: matrix.library == 'true'
+        run: |
+          cd workspace && \
+          nx g @nx/${{ matrix.runner }}:lib libs/${{ matrix.name }}/core \
+          --importPath=@workspace/${{ matrix.name }}-core \
+          --name=${{ matrix.name }}-core \
+          --linter=eslint \
+          --unitTestRunner=${{ matrix.unitTestRunner }} \
+          --useProjectJson=true 
 
       - name: Commit Changes Step
         id: git_commit
