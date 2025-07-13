@@ -28,7 +28,6 @@ jobs:
         bundler: [ esbuild ]
         unitTestRunner: [ jest, vitest, none ]
         e2eTestRunner: [ playwright, cypress, none ]
-        library: [ true, false ]
         exclude:
           - preset: nest
             unitTestRunner: vitest
@@ -104,7 +103,6 @@ jobs:
           --ci=skip
 
       - name: Generate Library Step
-        if: matrix.library == 'true'
         run: |
           cd workspace && \
           nx g @nx/${{ matrix.runner }}:lib libs/${{ matrix.name }}/core \
