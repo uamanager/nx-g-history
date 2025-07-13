@@ -81,12 +81,12 @@ jobs:
       - name: Generate Next Version Step
         run: |
           npx -y create-nx-workspace@latest \
-          --name=${{ matrix.name }} \
+          --name=workspace \
           --preset=${{ matrix.preset }} \
           --bundler=${{ matrix.bundler }} \
           --interactive=false \
           --workspaceType=integrated \
-          --appName=app \
+          --appName=${{ matrix.name }} \
           --style=scss \
           --standaloneApi=true \
           --routing=true \
