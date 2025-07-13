@@ -102,7 +102,8 @@ jobs:
           --useProjectJson=true \
           --ci=skip
 
-      - name: Generate Library Step
+      - name: Generate Server Library Step
+        if: matrix.runner == 'nest'
         run: |
           cd workspace && \
           npx -y nx@latest g @nx/${{ matrix.runner }}:lib libs/${{ matrix.name }}/core \
@@ -111,6 +112,17 @@ jobs:
           --linter=eslint \
           --unitTestRunner=${{ matrix.unitTestRunner }} \
           --useProjectJson=true 
+
+      - name: Generate Client Library Step
+        if: matrix.runner == 'angular'
+        run: |
+          cd workspace && \
+          npx -y nx@latest g @nx/${{ matrix.runner }}:lib libs/${{ matrix.name }}/core \
+          --importPath=@workspace/${{ matrix.name }}-core \
+          --name=${{ matrix.name }}-core \
+          --linter=eslint \
+          --style=scss \
+          --unitTestRunner=${{ matrix.unitTestRunner }}
 
       - name: Commit Changes Step
         id: git_commit
