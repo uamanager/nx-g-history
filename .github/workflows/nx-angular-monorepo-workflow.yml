@@ -58,12 +58,12 @@ jobs:
           git config user.email ${{ env.GIT_USER_EMAIL }}
 
       - name: Remove Previous Version Step
-        run: rm -rf ./${{ env.BRANCH_NAME }}
+        run: rm -rf ./${{ env.NAME }}
 
       - name: Generate Next Version Step
         run: |
           npx -y create-nx-workspace@latest \
-          --name=${{ env.BRANCH_NAME }} \
+          --name=${{ env.NAME }} \
           --preset=angular-monorepo \
           --interactive=false \
           --workspaceType=integrated \
@@ -88,7 +88,7 @@ jobs:
             echo "No changes detected"
             echo "changes=false" >> $GITHUB_OUTPUT
           else
-            git commit -m "chore(${{ env.BRANCH_NAME }}): create-nx-workspace@${{ steps.nx_version.outputs.version }}"
+            git commit -m "chore(${{ env.NAME }}): create-nx-workspace@${{ steps.nx_version.outputs.version }}"
             echo "changes=true" >> $GITHUB_OUTPUT
           fi
 
