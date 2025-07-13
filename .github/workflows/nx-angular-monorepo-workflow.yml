@@ -18,6 +18,10 @@ permissions:
 jobs:
   push:
     name: Generate Nx Angular-monorepo
+    strategy:
+      matrix:
+        unitTestRunner: [ jest, vitest, none ]
+        e2eTestRunner: [ playwright, cypress, none ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Step
@@ -42,12 +46,12 @@ jobs:
           git config user.email ${{ env.GIT_USER_EMAIL }}
 
       - name: Remove Previous Version Step
-        run: rm -rf ./${{ env.NAME }}
+        run: rm -rf ./${{ env.NAME }}-${{ matrix.unitTestRunner }}-${{ matrix.e2eTestRunner }}
 
       - name: Generate Next Version Step
         run: |
           npx -y create-nx-workspace@latest \
-          --name=${{ env.NAME }} \
+          --name=${{ env.NAME }}-${{ matrix.unitTestRunner }}-${{ matrix.e2eTestRunner }} \
           --preset=angular-monorepo \
           --interactive=false \
           --workspaceType=integrated \
@@ -55,12 +59,13 @@ jobs:
           --style=scss \
           --standaloneApi=true \
           --routing=true \
-          --workspaces=false \
           --framework=angular \
-          --unitTestRunner=jest \
-          --e2eTestRunner=cypress \
+          --unitTestRunner=${{ matrix.unitTestRunner }} \
+          --e2eTestRunner=${{ matrix.e2eTestRunner }} \
           --skipGit=false \
           --docker=false \
+          --workspaces=false \
+          --useProjectJson=true \
           --ci=skip
 
       - name: Commit Changes Step
@@ -71,7 +76,7 @@ jobs:
             echo "No changes detected"
             echo "changes=false" >> $GITHUB_OUTPUT
           else
-            git commit -m "chore(${{ env.NAME }}): create-nx-workspace@${{ steps.nx_version.outputs.version }}"
+            git commit -m "chore(${{ env.NAME }}-${{ matrix.unitTestRunner }}-${{ matrix.e2eTestRunner }}): create-nx-workspace@${{ steps.nx_version.outputs.version }}"
             echo "changes=true" >> $GITHUB_OUTPUT
           fi
 
