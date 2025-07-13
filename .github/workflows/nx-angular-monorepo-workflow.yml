@@ -46,8 +46,15 @@ jobs:
 
       - name: Generate Next Version Step
         run: |
-          npx -y create-nx-workspace@latest --interactive false --name ${{ env.NAME }} --appName 'client' --skipGit--docker false
-          
+          npx -y create-nx-workspace@latest \ 
+            --name=${{ env.NAME }} \ 
+            --framework=angular
+            --appName=client \
+            --interactive=false \ 
+            --skipGit=false \
+            --docker=false \
+            --ci=skip \
+
       - name: Commit Changes Step
         id: git_commit
         run: |
@@ -59,7 +66,7 @@ jobs:
             git commit -m "chore(${{ env.NAME }}): create-nx-workspace@${{ steps.nx_version.outputs.version }}"
             echo "changes=true" >> $GITHUB_OUTPUT
           fi
-          
+
       - name: Push Branch
         if: steps.git_commit.outputs.changes == 'true'
         run: git push origin master
