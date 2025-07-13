@@ -37,7 +37,7 @@ jobs:
             e2eTestRunner: cypress
         include:
           - name: client
-            preset: angular-monorepo
+            preset: angular
           - name: server
             preset: nest
     runs-on: ubuntu-latest
