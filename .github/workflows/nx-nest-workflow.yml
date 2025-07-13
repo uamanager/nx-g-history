@@ -17,11 +17,11 @@ permissions:
 
 jobs:
   push:
-    name: Generate Nx Angular-monorepo
+    name: Generate Nx Nest
     strategy:
       matrix:
-        unitTestRunner: [ jest, vitest, none ]
-        e2eTestRunner: [ playwright, cypress, none ]
+        unitTestRunner: [ jest, none ]
+        e2eTestRunner: [ jest, none ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Step
@@ -67,7 +67,7 @@ jobs:
           --preset=nest \
           --interactive=false \
           --workspaceType=integrated \
-          --appName=client \
+          --appName=server \
           --style=scss \
           --standaloneApi=true \
           --routing=true \

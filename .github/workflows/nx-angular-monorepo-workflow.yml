@@ -20,8 +20,10 @@ jobs:
     name: Generate Nx Angular-monorepo
     strategy:
       matrix:
+        bundler: [ esbuild, rspack, webpack ]
         unitTestRunner: [ jest, vitest, none ]
         e2eTestRunner: [ playwright, cypress, none ]
+        tailwind: [ true, false ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Step
@@ -31,7 +33,7 @@ jobs:
 
       - name: Create Branch
         run: |
-          BRANCH=${{ env.NAME }}-${{ matrix.unitTestRunner }}-${{ matrix.e2eTestRunner }}
+          BRANCH=${{ env.NAME }}-${{ matrix.bundler }}-${{ matrix.unitTestRunner }}-${{ matrix.e2eTestRunner }}-${{ matrix.tailwind }}
           git fetch origin $BRANCH || true
           if git show-ref --verify --quiet refs/remotes/origin/$BRANCH; then
           git checkout $BRANCH
@@ -65,6 +67,8 @@ jobs:
           npx -y create-nx-workspace@latest \
           --name=${{ env.NAME }} \
           --preset=angular-monorepo \
+          --bundler=${{ matrix.bundler }} \
+          --addTailwind=${{ matrix.tailwind }} \
           --interactive=false \
           --workspaceType=integrated \
           --appName=client \
