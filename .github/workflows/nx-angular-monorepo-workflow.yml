@@ -48,9 +48,17 @@ jobs:
         run: |
           npx -y create-nx-workspace@latest \ 
             --name=${{ env.NAME }} \ 
-            --framework=angular
-            --appName=client \
+            --preset=angular-monorepo
             --interactive=false \ 
+            --workspaceType=integrated \ 
+            --appName=client \
+            --style=scss \
+            --standaloneApi=true \
+            --routing=true \
+            --workspaces=false \
+            --framework=angular
+            --unitTestRunner=jest \
+            --e2eTestRunner=cypress \
             --skipGit=false \
             --docker=false \
             --ci=skip
