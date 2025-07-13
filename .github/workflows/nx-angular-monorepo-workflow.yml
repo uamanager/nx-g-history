@@ -25,7 +25,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node and Yarn Cache Step
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -46,12 +46,7 @@ jobs:
 
       - name: Generate Next Version Step
         run: |
-          npx -y create-nx-workspace@latest 
-            --interactive false 
-            --name ${{ env.NAME }} 
-            --appName 'client' 
-            --skipGit
-            --docker false
+          npx -y create-nx-workspace@latest --interactive false --name ${{ env.NAME }} --appName 'client' --skipGit--docker false
           
       - name: Commit Changes Step
         id: git_commit
