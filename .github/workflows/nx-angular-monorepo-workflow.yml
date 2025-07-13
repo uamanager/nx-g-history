@@ -53,7 +53,7 @@ jobs:
             --interactive=false \ 
             --skipGit=false \
             --docker=false \
-            --ci=skip \
+            --ci=skip
 
       - name: Commit Changes Step
         id: git_commit
