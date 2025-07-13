@@ -24,7 +24,7 @@ jobs:
     name: Generate Nx Monorepo
     strategy:
       matrix:
-        preset: [ angular-monorepo, nest ]
+        preset: [ angular, nest ]
         bundler: [ esbuild ]
         unitTestRunner: [ jest, vitest, none ]
         e2eTestRunner: [ playwright, cypress, none ]
