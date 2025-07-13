@@ -1,15 +1,19 @@
-name: Nx Nest Workflow
+name: Nx Generate Workflow
+
 on:
   workflow_dispatch:
-  workflow_call:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '0 2 * * *'
 
 env:
-  NAME: 'nx-nest'
   GIT_USER_NAME: 'github-actions[bot]'
   GIT_USER_EMAIL: 'github-actions[bot]@users.noreply.github.com'
 
 concurrency:
-  group: nx-nest-workflow
+  group: nx-g-workflow
   cancel-in-progress: true
 
 permissions:
@@ -17,11 +21,25 @@ permissions:
 
 jobs:
   push:
-    name: Generate Nx Nest
+    name: Generate Nx Monorepo
     strategy:
       matrix:
-        unitTestRunner: [ jest, none ]
-        e2eTestRunner: [ jest, none ]
+        preset: [ angular-monorepo, nest ]
+        bundler: [ esbuild ]
+        unitTestRunner: [ jest, vitest, none ]
+        e2eTestRunner: [ playwright, cypress, none ]
+        exclude:
+          - preset: nest
+            unitTestRunner: vitest
+          - preset: nest
+            e2eTestRunner: playwright
+          - preset: nest
+            e2eTestRunner: cypress
+        include:
+          - name: client
+            preset: angular-monorepo
+          - name: server
+            preset: nest
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Step
@@ -31,7 +49,7 @@ jobs:
 
       - name: Create Branch
         run: |
-          BRANCH=${{ env.NAME }}-${{ matrix.unitTestRunner }}-${{ matrix.e2eTestRunner }}
+          BRANCH=${{ matrix.preset }}/${{ matrix.bundler }}-${{ matrix.unitTestRunner }}-${{ matrix.e2eTestRunner }}
           git fetch origin $BRANCH || true
           if git show-ref --verify --quiet refs/remotes/origin/$BRANCH; then
           git checkout $BRANCH
@@ -58,20 +76,20 @@ jobs:
           git config user.email ${{ env.GIT_USER_EMAIL }}
 
       - name: Remove Previous Version Step
-        run: rm -rf ./${{ env.NAME }}
+        run: rm -rf ./${{ matrix.preset }}
 
       - name: Generate Next Version Step
         run: |
           npx -y create-nx-workspace@latest \
-          --name=${{ env.NAME }} \
-          --preset=nest \
+          --name=${{ matrix.name }} \
+          --preset=${{ matrix.preset }} \
+          --bundler=${{ matrix.bundler }} \
           --interactive=false \
           --workspaceType=integrated \
-          --appName=server \
+          --appName=app \
           --style=scss \
           --standaloneApi=true \
           --routing=true \
-          --framework=nest \
           --unitTestRunner=${{ matrix.unitTestRunner }} \
           --e2eTestRunner=${{ matrix.e2eTestRunner }} \
           --skipGit=false \
@@ -88,7 +106,7 @@ jobs:
             echo "No changes detected"
             echo "changes=false" >> $GITHUB_OUTPUT
           else
-            git commit -m "chore(${{ env.NAME }}): create-nx-workspace@${{ steps.nx_version.outputs.version }}"
+            git commit -m "chore(${{ matrix.preset }}): create-nx-workspace@${{ steps.nx_version.outputs.version }}"
             echo "changes=true" >> $GITHUB_OUTPUT
           fi
 
