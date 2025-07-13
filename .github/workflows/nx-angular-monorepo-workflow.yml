@@ -1,0 +1,71 @@
+name: Nx Angular-monorepo Workflow
+on:
+  workflow_dispatch:
+  workflow_call:
+
+env:
+  NAME: 'nx-angular-monorepo'
+  GIT_USER_NAME: 'github-actions[bot]'
+  GIT_USER_EMAIL: 'github-actions[bot]@users.noreply.github.com'
+
+concurrency:
+  group: nx-angular-monorepo-workflow
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  push:
+    name: Generate Nx Angular-monorepo
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Step
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node and Yarn Cache Step
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Get Nx Version
+        id: nx_version
+        run: |
+          VERSION=$(npx -y create-nx-workspace@latest --version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Configure Git Step
+        run: |
+          git config user.name ${{ env.GIT_USER_NAME }}
+          git config user.email ${{ env.GIT_USER_EMAIL }}
+
+      - name: Remove Previous Version Step
+        run: rm -rf ./${{ env.NAME }}
+
+      - name: Generate Next Version Step
+        run: |
+          npx -y create-nx-workspace@latest 
+            --interactive false 
+            --name ${{ env.NAME }} 
+            --appName 'client' 
+            --skipGit
+            --docker false
+          
+      - name: Commit Changes Step
+        id: git_commit
+        run: |
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes detected"
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            git commit -m "chore(${{ env.NAME }}): create-nx-workspace@${{ steps.nx_version.outputs.version }}"
+            echo "changes=true" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Push Branch
+        if: steps.git_commit.outputs.changes == 'true'
+        run: git push origin master
