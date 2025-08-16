@@ -13,6 +13,7 @@ export default defineConfig(() => ({
   //  plugins: [ nxViteTsPaths() ],
   // },
   test: {
+    name: 'client-core',
     watch: false,
     globals: true,
     environment: 'jsdom',
