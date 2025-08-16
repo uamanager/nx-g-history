@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'lib-client-core',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './client-core.html',
   styleUrl: './client-core.scss',
 })
