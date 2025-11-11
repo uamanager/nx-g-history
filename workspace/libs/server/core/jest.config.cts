@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   displayName: 'server-core',
   preset: '../../../jest.preset.js',
   testEnvironment: 'node',
