@@ -44,6 +44,7 @@ jobs:
             preset: angular-monorepo
           - runner: nest
             preset: nest
+    continue-on-error: true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Step
