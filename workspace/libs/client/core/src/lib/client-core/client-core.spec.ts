@@ -12,7 +12,7 @@ describe('ClientCore', () => {
 
     fixture = TestBed.createComponent(ClientCore);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    await fixture.whenStable();
   });
 
   it('should create', () => {
