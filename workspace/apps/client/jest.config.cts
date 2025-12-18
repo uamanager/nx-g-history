@@ -1,8 +1,8 @@
-export default {
-  displayName: 'client-core',
-  preset: '../../../jest.preset.js',
+module.exports = {
+  displayName: 'client',
+  preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  coverageDirectory: '../../../coverage/libs/client/core',
+  coverageDirectory: '../../coverage/apps/client',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',
