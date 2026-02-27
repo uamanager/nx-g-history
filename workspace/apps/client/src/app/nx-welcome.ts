@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
      Delete this file and get started with your project!
      * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      -->
+
     <style>
       html {
         -webkit-text-size-adjust: 100%;
@@ -505,6 +506,7 @@ import { CommonModule } from '@angular/common';
         }
       }
     </style>
+
     <div class="wrapper">
       <div class="container">
         <!--  WELCOME  -->
