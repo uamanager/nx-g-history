@@ -35,6 +35,9 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "dependsOn": ["build"],
+      "readyWhen": {
+        "signal": true
+      },
       "options": {
         "buildTarget": "server:build",
         "runBuildTargetDependencies": false
