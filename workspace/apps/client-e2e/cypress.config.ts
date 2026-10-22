@@ -5,7 +5,9 @@ module.exports = defineConfig({
     ...nxE2EPreset(__filename, {
       cypressDir: 'src',
       webServerCommands: {
-        default: 'npx nx run client:serve',
+        default: process.env['CI']
+          ? 'npx nx run client:serve-static'
+          : 'npx nx run client:serve',
         production: 'npx nx run client:serve-static',
       },
       ciWebServerCommand: 'npx nx run client:serve-static',
