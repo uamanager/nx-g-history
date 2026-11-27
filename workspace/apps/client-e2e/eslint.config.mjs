@@ -1,7 +1,7 @@
 import cypress from 'eslint-plugin-cypress/flat';
 import baseConfig from '../../eslint.config.mjs';
 
-export default [
+const eslintConfig = [
   cypress.configs['recommended'],
   ...baseConfig,
   {
@@ -9,3 +9,5 @@ export default [
     rules: {},
   },
 ];
+
+export default eslintConfig;
